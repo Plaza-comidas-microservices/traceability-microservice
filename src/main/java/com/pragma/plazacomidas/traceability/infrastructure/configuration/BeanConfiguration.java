@@ -1,28 +1,31 @@
-package com.pragma.powerup.infrastructure.configuration;
+package com.pragma.plazacomidas.traceability.infrastructure.configuration;
 
-import com.pragma.powerup.domain.api.IObjectServicePort;
-import com.pragma.powerup.domain.spi.IObjectPersistencePort;
-import com.pragma.powerup.domain.usecase.ObjectUseCase;
-import com.pragma.powerup.infrastructure.out.jpa.adapter.ObjectJpaAdapter;
-import com.pragma.powerup.infrastructure.out.jpa.mapper.IObjectEntityMapper;
-import com.pragma.powerup.infrastructure.out.jpa.repository.IObjectRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.pragma.plazacomidas.traceability.domain.api.ITraceabilityServicePort;
+import com.pragma.plazacomidas.traceability.domain.spi.IOrderStatusLogPersistencePort;
+import com.pragma.plazacomidas.traceability.domain.usecase.TraceabilityUseCase;
+import com.pragma.plazacomidas.traceability.infrastructure.out.mongo.adapter.OrderStatusLogMongoAdapter;
+import com.pragma.plazacomidas.traceability.infrastructure.out.mongo.mapper.IOrderStatusLogDocumentMapper;
+import com.pragma.plazacomidas.traceability.infrastructure.out.mongo.repository.IOrderStatusLogMongoRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class BeanConfiguration {
-    private final IObjectRepository objectRepository;
-    private final IObjectEntityMapper objectEntityMapper;
+
+    private final IOrderStatusLogMongoRepository orderStatusLogMongoRepository;
+    private final IOrderStatusLogDocumentMapper orderStatusLogDocumentMapper;
 
     @Bean
-    public IObjectPersistencePort objectPersistencePort() {
-        return new ObjectJpaAdapter(objectRepository, objectEntityMapper);
+    public IOrderStatusLogPersistencePort orderStatusLogPersistencePort() {
+        return new OrderStatusLogMongoAdapter(orderStatusLogMongoRepository, orderStatusLogDocumentMapper);
     }
 
     @Bean
-    public IObjectServicePort objectServicePort() {
-        return new ObjectUseCase(objectPersistencePort());
+    public ITraceabilityServicePort traceabilityServicePort() {
+        return new TraceabilityUseCase(orderStatusLogPersistencePort());
     }
 }
