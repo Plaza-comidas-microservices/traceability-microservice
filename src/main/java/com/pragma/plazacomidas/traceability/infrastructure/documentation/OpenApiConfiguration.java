@@ -1,4 +1,4 @@
-package com.pragma.powerup.infrastructure.documentation;
+package com.pragma.plazacomidas.traceability.infrastructure.documentation;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -17,7 +17,7 @@ public class OpenApiConfiguration {
         return new OpenAPI()
             .components(new Components())
             .info(new Info()
-                .title("Hexagonal Power-up API")
+                .title("Traceability Microservice API")
                 .version(appVersion)
                 .description(appDescription)
                 .termsOfService("http://swagger.io/terms/")

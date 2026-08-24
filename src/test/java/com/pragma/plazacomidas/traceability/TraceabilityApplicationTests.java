@@ -1,10 +1,10 @@
-package com.pragma.powerup;
+package com.pragma.plazacomidas.traceability;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PowerUpApplicationTests {
+class TraceabilityApplicationTests {
 
     @Test
     void contextLoads() {

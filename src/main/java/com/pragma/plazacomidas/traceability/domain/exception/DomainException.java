@@ -1,4 +1,4 @@
-package com.pragma.powerup.domain.exception;
+package com.pragma.plazacomidas.traceability.domain.exception;
 
 public class DomainException extends RuntimeException {
     public DomainException(String message) {
