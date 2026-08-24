@@ -40,6 +40,7 @@ class TraceabilityUseCaseTest {
         return new OrderStatusLogModel(null, ORDER_ID, CLIENT_ID, previousStatus, newStatus, changedAt);
     }
 
+    // ------ Happy Path ------------
     @Test
     void shouldLogStatusChangeSuccessfullyWhenDataIsValid() {
         OrderStatusLogModel logModel = buildLog(null, "PENDIENTE", null);
@@ -49,6 +50,21 @@ class TraceabilityUseCaseTest {
 
         verify(orderStatusLogPersistencePort, times(1)).save(any(OrderStatusLogModel.class));
     }
+
+    @Test
+    void shouldReturnTraceabilitySortedByDateWhenOrderBelongsToClient() {
+        OrderStatusLogModel readyLog = buildLog("EN_PREPARACION", "LISTO", Instant.now());
+        OrderStatusLogModel pendingLog = buildLog(null, "PENDIENTE", Instant.now().minusSeconds(60));
+        when(orderStatusLogPersistencePort.findByOrderId(ORDER_ID)).thenReturn(List.of(readyLog, pendingLog));
+
+        List<OrderStatusLogModel> result = traceabilityUseCase.getTraceabilityByOrderId(ORDER_ID, CLIENT_ID);
+
+        assertEquals(2, result.size());
+        assertEquals("PENDIENTE", result.get(0).getNewStatus());
+        assertEquals("LISTO", result.get(1).getNewStatus());
+    }
+
+    // ---------- Sad Path ------------------
 
     @Test
     void shouldThrowExceptionWhenLoggingWithoutOrderId() {
@@ -69,19 +85,6 @@ class TraceabilityUseCaseTest {
                 () -> traceabilityUseCase.logStatusChange(logModel));
 
         assertEquals("El nuevo estado es obligatorio", exception.getMessage());
-    }
-
-    @Test
-    void shouldReturnTraceabilitySortedByDateWhenOrderBelongsToClient() {
-        OrderStatusLogModel readyLog = buildLog("EN_PREPARACION", "LISTO", Instant.now());
-        OrderStatusLogModel pendingLog = buildLog(null, "PENDIENTE", Instant.now().minusSeconds(60));
-        when(orderStatusLogPersistencePort.findByOrderId(ORDER_ID)).thenReturn(List.of(readyLog, pendingLog));
-
-        List<OrderStatusLogModel> result = traceabilityUseCase.getTraceabilityByOrderId(ORDER_ID, CLIENT_ID);
-
-        assertEquals(2, result.size());
-        assertEquals("PENDIENTE", result.get(0).getNewStatus());
-        assertEquals("LISTO", result.get(1).getNewStatus());
     }
 
     @Test
