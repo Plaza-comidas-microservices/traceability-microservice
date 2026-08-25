@@ -9,4 +9,6 @@ import com.pragma.plazacomidas.traceability.infrastructure.out.mongo.entity.Orde
 public interface IOrderStatusLogMongoRepository extends MongoRepository<OrderStatusLogDocument, String> {
 
     List<OrderStatusLogDocument> findByOrderId(Long orderId);
+
+    List<OrderStatusLogDocument> findByOrderIdIn(List<Long> orderIds);
 }

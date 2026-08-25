@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pragma.plazacomidas.traceability.application.dto.request.OrderStatusLogRequestDto;
+import com.pragma.plazacomidas.traceability.application.dto.request.OrderTimingsRequestDto;
 import com.pragma.plazacomidas.traceability.application.dto.response.OrderStatusLogResponseDto;
+import com.pragma.plazacomidas.traceability.application.dto.response.OrderTimingResponseDto;
 import com.pragma.plazacomidas.traceability.application.handler.ITraceabilityHandler;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,5 +56,16 @@ public class TraceabilityRestController {
     public ResponseEntity<List<OrderStatusLogResponseDto>> getTraceabilityByOrderId(@PathVariable Long orderId) {
         Long authenticatedClientId = (Long) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         return ResponseEntity.ok(traceabilityHandler.getTraceabilityByOrderId(orderId, authenticatedClientId));
+    }
+
+    @Operation(summary = "Get the start/end timestamps of a batch of orders (used for communication between microservices)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Timings returned",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = OrderTimingResponseDto.class))))
+    })
+    @PostMapping("/orders/timings")
+    public ResponseEntity<List<OrderTimingResponseDto>> getOrderTimings(@RequestBody OrderTimingsRequestDto orderTimingsRequestDto) {
+        return ResponseEntity.ok(traceabilityHandler.getOrderTimings(orderTimingsRequestDto));
     }
 }
