@@ -9,4 +9,6 @@ public interface IOrderStatusLogPersistencePort {
     OrderStatusLogModel save(OrderStatusLogModel orderStatusLogModel);
 
     List<OrderStatusLogModel> findByOrderId(Long orderId);
+
+    List<OrderStatusLogModel> findByOrderIdIn(List<Long> orderIds);
 }

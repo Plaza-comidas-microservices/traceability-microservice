@@ -30,4 +30,9 @@ public class OrderStatusLogMongoAdapter implements IOrderStatusLogPersistencePor
     public List<OrderStatusLogModel> findByOrderId(Long orderId) {
         return orderStatusLogDocumentMapper.toModelList(orderStatusLogMongoRepository.findByOrderId(orderId));
     }
+
+    @Override
+    public List<OrderStatusLogModel> findByOrderIdIn(List<Long> orderIds) {
+        return orderStatusLogDocumentMapper.toModelList(orderStatusLogMongoRepository.findByOrderIdIn(orderIds));
+    }
 }

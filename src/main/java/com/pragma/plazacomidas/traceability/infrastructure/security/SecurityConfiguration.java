@@ -29,6 +29,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/traceability/log").permitAll() //dejo este sin protección para la comunicación entre microSS
+                .antMatchers(HttpMethod.POST, "/api/v1/traceability/orders/timings").permitAll() //dejo este sin protección para la comunicación entre microSS
                 .antMatchers(HttpMethod.GET, "/api/v1/traceability/order/**").hasRole("CLIENT")
                 .anyRequest().authenticated()
             )

@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.pragma.plazacomidas.traceability.domain.exception.DomainException;
 import com.pragma.plazacomidas.traceability.domain.model.OrderStatusLogModel;
+import com.pragma.plazacomidas.traceability.domain.model.OrderTimingModel;
 import com.pragma.plazacomidas.traceability.domain.spi.IOrderStatusLogPersistencePort;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,5 +108,30 @@ class TraceabilityUseCaseTest {
                 () -> traceabilityUseCase.getTraceabilityByOrderId(ORDER_ID, CLIENT_ID));
 
         assertEquals("Este pedido no te pertenece", exception.getMessage());
+    }
+
+    @Test
+    void shouldReturnStartAndEndTimingsForEachOrder() {
+        Instant orderOneStart = Instant.now().minusSeconds(120);
+        Instant orderOneEnd = Instant.now();
+        Instant orderTwoStart = Instant.now().minusSeconds(60);
+        Instant orderTwoEnd = Instant.now().minusSeconds(10);
+
+        OrderStatusLogModel orderOnePending = new OrderStatusLogModel(null, 1L, CLIENT_ID, null, "PENDIENTE", orderOneStart);
+        OrderStatusLogModel orderOneDelivered = new OrderStatusLogModel(null, 1L, CLIENT_ID, "LISTO", "ENTREGADO", orderOneEnd);
+        OrderStatusLogModel orderTwoPending = new OrderStatusLogModel(null, 2L, CLIENT_ID, null, "PENDIENTE", orderTwoStart);
+        OrderStatusLogModel orderTwoDelivered = new OrderStatusLogModel(null, 2L, CLIENT_ID, "LISTO", "ENTREGADO", orderTwoEnd);
+
+        when(orderStatusLogPersistencePort.findByOrderIdIn(List.of(1L, 2L)))
+                .thenReturn(List.of(orderOnePending, orderOneDelivered, orderTwoPending, orderTwoDelivered));
+
+        List<OrderTimingModel> result =
+                traceabilityUseCase.getOrderTimings(List.of(1L, 2L));
+
+        assertEquals(2, result.size());
+        OrderTimingModel orderOneTiming = result.stream()
+                .filter(timing -> timing.getOrderId().equals(1L)).findFirst().orElseThrow();
+        assertEquals(orderOneStart, orderOneTiming.getStartedAt());
+        assertEquals(orderOneEnd, orderOneTiming.getEndedAt());
     }
 }
